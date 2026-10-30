@@ -1,5 +1,5 @@
 # 对话者身份注入（astrbot_plugin_sender_context）
-
+需搭配人格分流（astrbot_plugin_persona_router）使用
 把**当前发言人的身份**写进 system prompt，让「按人分流」的人格设定有判断依据。
 
 ## 解决的问题
