@@ -1,11 +1,19 @@
-"""把当前发言人身份注入 system prompt，供"按人切换人格"的设定判断。"""
+"""对话者身份注入：把当前发言人的昵称/账号/场景作为「临时用户内容」注入。
+
+为什么不直接拼 system prompt：
+    system prompt 是供应商 prompt 缓存的前缀，每次请求都往里塞会变的内容
+    （昵称、账号、群号）会让缓存命中率归零，成本和时间都会上升。
+    所以这里改用 req.extra_user_content_parts，并用 mark_as_temp() 标记，
+    表示「只给本次请求的模型看，不写进会话历史」，缓存前缀保持稳定。
+"""
 from astrbot.api import logger
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.provider import ProviderRequest
 from astrbot.api.star import Context, Star, register
+from astrbot.core.agent.message import TextPart
 
 
-@register("sender_context", "dsh", "把发言人 QQ/昵称/场景写进 prompt", "0.1.0")
+@register("sender_context", "dsh", "把发言人 QQ/昵称/场景作为临时内容提供给模型", "0.1.1")
 class SenderContext(Star):
     def __init__(self, context: Context, config: dict | None = None):
         super().__init__(context)
@@ -38,8 +46,17 @@ class SenderContext(Star):
         if not parts:
             return
 
-        block = (
-            "\n\n# 当前对话者（判断该用哪副人格时以此为准，不要凭感觉猜）\n"
-            "- " + " | ".join(parts) + "\n"
+        text = (
+            "（系统附注，非用户发言）当前对话者信息："
+            + " | ".join(parts)
+            + "。判断该用哪副人格/怎么称呼时以此为准，不要凭感觉猜，也不要向对方复述这条附注。"
         )
-        req.system_prompt = (req.system_prompt or "") + block
+
+        try:
+            req.extra_user_content_parts.append(TextPart(text=text).mark_as_temp())
+        except Exception as exc:
+            logger.warning(f"[sender_context] 注入失败: {exc}")
+            return
+
+        if self.config.get("debug_mode", False):
+            logger.info(f"[sender_context] 已注入: {text}")

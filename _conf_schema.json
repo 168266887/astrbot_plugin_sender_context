@@ -7,6 +7,13 @@
   "include_group_id": {
     "description": "附带群号",
     "type": "bool",
+    "hint": "关闭后只标「私聊/群聊」，不暴露具体群号",
     "default": true
+  },
+  "debug_mode": {
+    "description": "调试日志",
+    "type": "bool",
+    "hint": "开启后在日志里打印实际注入的内容，排查用",
+    "default": false
   }
 }

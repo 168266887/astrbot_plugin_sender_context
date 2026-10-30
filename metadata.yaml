@@ -1,6 +1,6 @@
 name: astrbot_plugin_sender_context
 display_name: 对话者身份注入
-desc: 把当前发言人的 QQ 号/昵称/场景写进 system prompt，让"按人分流"的人格设定有依据
-version: v0.1.0
+desc: 把当前发言人的 QQ 号/昵称/场景作为临时用户内容提供给模型，让"按人分流"的人格设定有依据
+version: v0.1.1
 author: dsh
 repo: https://github.com/168266887/astrbot_plugin_sender_context
