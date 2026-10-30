@@ -1,0 +1,12 @@
+{
+  "enabled": {
+    "description": "启用身份注入",
+    "type": "bool",
+    "default": true
+  },
+  "include_group_id": {
+    "description": "附带群号",
+    "type": "bool",
+    "default": true
+  }
+}
